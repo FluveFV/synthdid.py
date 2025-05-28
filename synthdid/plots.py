@@ -2,103 +2,106 @@ import matplotlib, matplotlib.pyplot as plt, numpy as np, pandas as pd
 import plotly.graph_objects as go
 
 class Plots:
+    # TO DO: create an elegant interactive plotly graph, to save as html. 
+    # This one currently produces a correct graph, it's just ugly. 
     
-    def plot_outcomes_plotly(self, times=None, time_title_cb=int, labels=None, wtplot=True, axlimit_zero=False):
-        sdid_weights = self.weights
-        lambda_wg = sdid_weights["lambda"]
-        omega_wg = sdid_weights["omega"]
-        table_result = self.att_info
-        N0s, T0s = table_result.N0, table_result.T0
+    # def plot_outcomes_plotly(self, times=None, time_title_cb=int, labels=None, wtplot=True, axlimit_zero=False):
+    #     sdid_weights = self.weights
+    #     lambda_wg = sdid_weights["lambda"]
+    #     omega_wg = sdid_weights["omega"]
+    #     table_result = self.att_info
+    #     N0s, T0s = table_result.N0, table_result.T0
     
-        if times is None:
-            times = table_result.time
-        if labels is None:
-            labels = ['Controllo sintetico', self.data[self.data[self.treatment]==1][self.unit].values[0]]
+    #     if times is None:
+    #         times = table_result.time
+    #     if labels is None:
+    #         labels = ['Controllo sintetico', self.data[self.data[self.treatment]==1][self.unit].values[0]]
     
-        Y_setups = self.Y_betas
-        t_span = np.sort(np.unique(self.data_ref.time))
-        plots = []
+    #     Y_setups = self.Y_betas
+    #     t_span = np.sort(np.unique(self.data_ref.time))
+    #     plots = []
     
-        for i, time in enumerate(times):
-            omega_hat = omega_wg[i]
-            lambda_hat = lambda_wg[i]
-            N0, T0 = N0s[i], T0s[i]
-            Y_year = np.array(Y_setups[i])
+    #     for i, time in enumerate(times):
+    #         omega_hat = omega_wg[i]
+    #         lambda_hat = lambda_wg[i]
+    #         N0, T0 = N0s[i], T0s[i]
+    #         Y_year = np.array(Y_setups[i])
     
-            Y_t = np.mean(Y_year[N0:, :], axis=0)
-            Y_c = Y_year[:N0, :]
-            Y_sdid_traj = np.dot(omega_hat, Y_c)
-            values_traj = np.concatenate((Y_sdid_traj, Y_t))
+    #         Y_t = np.mean(Y_year[N0:, :], axis=0)
+    #         Y_c = Y_year[:N0, :]
+    #         Y_sdid_traj = np.dot(omega_hat, Y_c)
+    #         values_traj = np.concatenate((Y_sdid_traj, Y_t))
     
-            plot_y_min = values_traj.min()
-            plot_y_max = values_traj.max()
-            plot_height = plot_y_max - plot_y_min
-            base_plot = 0 if axlimit_zero else plot_y_min - plot_height / 5
+    #         plot_y_min = values_traj.min()
+    #         plot_y_max = values_traj.max()
+    #         plot_height = plot_y_max - plot_y_min
+    #         base_plot = 0 if axlimit_zero else plot_y_min - plot_height / 5
     
-            range_fill_y = lambda_hat * plot_height / 3 + base_plot
-            range_fill = pd.DataFrame({
-                "time": t_span[:T0],
-                "line": range_fill_y
-            })
+    #         range_fill_y = lambda_hat * plot_height / 3 + base_plot
+    #         range_fill = pd.DataFrame({
+    #             "time": t_span[:T0],
+    #             "line": range_fill_y
+    #         })
     
-            trajectory = pd.DataFrame({
-                "time": t_span,
-                "control": Y_sdid_traj,
-                "treatment": Y_t
-            })
+    #         trajectory = pd.DataFrame({
+    #             "time": t_span,
+    #             "control": Y_sdid_traj,
+    #             "treatment": Y_t
+    #         })
     
-            fig = go.Figure()
+    #         fig = go.Figure()
     
-            # control line
-            fig.add_trace(go.Scatter(
-                x=trajectory["time"], y=trajectory["control"],
-                mode='lines', name=labels[0],
-                line=dict(dash='dash', color='steelblue')
-            ))
+    #         # control line
+    #         fig.add_trace(go.Scatter(
+    #             x=trajectory["time"], y=trajectory["control"],
+    #             mode='lines', name=labels[0],
+    #             line=dict(dash='dash', color='steelblue')
+    #         ))
     
-            # treatment line
-            fig.add_trace(go.Scatter(
-                x=trajectory["time"], y=trajectory["treatment"],
-                mode='lines', name=labels[1],
-                line=dict(color='orange')
-            ))
+    #         # treatment line
+    #         fig.add_trace(go.Scatter(
+    #             x=trajectory["time"], y=trajectory["treatment"],
+    #             mode='lines', name=labels[1],
+    #             line=dict(color='orange')
+    #         ))
     
-            # area under weights
-            if wtplot:
-                fig.add_trace(go.Scatter(
-                    x=range_fill["time"], y=range_fill["line"],
-                    fill='tozeroy',
-                    mode='none',
-                    name='',
-                    fillcolor='gray',
-                    opacity=0.4
-                ))
+    #         # area under weights
+    #         if wtplot:
+    #             fig.add_trace(go.Scatter(
+    #                 x=range_fill["time"], y=range_fill["line"],
+    #                 fill='tozeroy',
+    #                 mode='none',
+    #                 name='',
+    #                 fillcolor='gray',
+    #                 opacity=0.4
+    #             ))
     
-            #  Adoption year
-            fig.add_vline(x=time, line=dict(dash='dash', color='black', width=1))
+    #         #  year of treatment
+    #         fig.add_vline(x=time, line=dict(dash='dash', color='black', width=1))
     
-            # zero line for weights
-            if base_plot < 0 and plot_y_max > 0:
-                fig.add_hline(y=0, line=dict(dash='dash', color='gray', width=1))
+    #         # zero line for weights  #TO FIX
+    #         if base_plot < 0 and plot_y_max > 0:
+    #             fig.add_hline(y=0, line=dict(dash='dash', color='gray', width=1))
     
-            fig.update_layout(
-                title=f"Adoption: {time_title_cb(time)}",
-                xaxis_title="Time",
-                yaxis_title="Outcome",
-                legend=dict(x=0.8, y=1),
-                template="plotly_white"
-            )
+    #         fig.update_layout(
+    #             title=f"Adoption: {time_title_cb(time)}",
+    #             xaxis_title="Time",
+    #             yaxis_title="Outcome",
+    #             legend=dict(x=0.8, y=1),
+    #             template="plotly_white"
+    #         )
     
-            if axlimit_zero:
-                fig.update_yaxes(range=[0, None])
+    #         if axlimit_zero:
+    #             fig.update_yaxes(range=[0, None])
     
-            plots.append(fig)
+    #         plots.append(fig)
     
-        self.plot_outcomes_plotly = plots
-        return self
+    #     self.plot_outcomes_plotly = plots
+    #     return self
         
     def plot_outcomes(self, times = None, time_title_cb = int, labels=None, wtplot=True, axlimit_zero=False):
-        # matplotlib.use('Agg')
+        
+        matplotlib.use('Agg')  #freeze if using in a notebook
         sdid_weights = self.weights
         lambda_wg = sdid_weights["lambda"]
         omega_wg = sdid_weights["omega"]
@@ -157,7 +160,7 @@ class Plots:
                 ax.fill_between("time", base_plot, "line", data=range_fill, label="", alpha=0.6, color="gray")
             ax.axvline(x=times[i], label="", color='k', linestyle="--", lw=.8)
             
-            ax.set_xlabel("Tempo")
+            ax.set_xlabel("Tempo")  #changed data-specific feature names
             ax.set_ylabel("Natalità" if self.outcome == 'tas_mean' else "Migrazione")
             
             #ax.set_title("Adoption: " + str(time_title_cb(time)));
