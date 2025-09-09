@@ -2,7 +2,7 @@ import pandas as pd, numpy as np
 
 def panel_matrices(data: pd.DataFrame(), unit, time, treatment, outcome, covariates = None): #-> data_prep
 	if len(np.unique(data[treatment])) != 2:
-		print("Error")
+		None#print("Error")
 
 	data = data.reset_index()
 	data_ref = pd.DataFrame()
